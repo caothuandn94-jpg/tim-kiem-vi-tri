@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>Tìm kiếm kho thuốc</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    h2 { margin-bottom: 10px; }
+    input { width: 400px; padding: 8px; }
+    table { border-collapse: collapse; margin-top: 20px; width: 100%; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background: #f2f2f2; }
+    tr:hover { background: #fafafa; }
+  </style>
+</head>
+<body>
+
+  <h2>🔍 Tìm kiếm thuốc / vật tư theo kho</h2>
+
+  <input 
+    type="text" 
+    id="searchInput" 
+    placeholder="Nhập STT, mã dược, tên, ĐVT, tủ hoặc tầng..." 
+    onkeyup="searchData()" 
+  />
+
+  <table id="dataTable">
+    <thead>
+      <tr>
+        <th>STT</th>
+        <th>Mã dược</th>
+        <th>Tên</th>
+        <th>ĐVT</th>
+        <th>Tủ</th>
+        <th>Tầng</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <!-- 👉 FILE DỮ LIỆU ĐÃ CÓ -->
+  <script src="data.js"></script>
+
+  <script>
+    const tableBody = document.querySelector("#dataTable tbody");
+
+    function renderTable(items) {
+  tableBody.innerHTML = "";
+  items.forEach(item => {
+    const row = `<tr>
+      <td>${item["STT"]}</td>
+      <td>${item["Mã dược"]}</td>
+      <td>${item["Tên thuốc, nồng độ, hàm lượng"]}</td>
+      <td>${item["Đơn vị tính"]}</td>
+      <td>${item["tủ"]}</td>
+      <td>${item["tầng (từ dưới lên)"]}</td>
+    </tr>`;
+    tableBody.innerHTML += row;
+  });
+}
+
+    function searchData() {
+  const keyword = document
+    .getElementById("searchInput")
+    .value
+    .toLowerCase();
+
+  const filtered = data.filter(item =>
+    String(item["STT"]).toLowerCase().includes(keyword) ||
+    String(item["Mã dược"]).toLowerCase().includes(keyword) ||
+    String(item["Tên thuốc, nồng độ, hàm lượng"]).toLowerCase().includes(keyword) ||
+    String(item["Đơn vị tính"]).toLowerCase().includes(keyword) ||
+    String(item["tủ"]).toLowerCase().includes(keyword) ||
+    String(item["tầng (từ dưới lên)"]).toLowerCase().includes(keyword)
+  );
+
+  renderTable(filtered);
+}
+
+    // Hiển thị toàn bộ dữ liệu khi mở trang
+    renderTable(data);
+  </script>
+
+</body>
+</html>
