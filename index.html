@@ -2,84 +2,76 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <title>Tìm kiếm kho thuốc</title>
+  <title>Tra cứu vị trí thuốc & vật tư y tế</title>
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    h2 { margin-bottom: 10px; }
-    input { width: 400px; padding: 8px; }
-    table { border-collapse: collapse; margin-top: 20px; width: 100%; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-    th { background: #f2f2f2; }
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    h1 { margin-bottom: 10px; }
+    input { width: 100%; padding: 10px; font-size: 16px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+    th, td { border: 1px solid #ccc; padding: 6px; font-size: 14px; vertical-align: top; }
+    th { background: #f3f3f3; }
     tr:hover { background: #fafafa; }
+    .note { margin-top: 10px; color: #666; font-size: 13px; }
   </style>
 </head>
 <body>
 
-  <h2>🔍 Tìm kiếm thuốc / vật tư theo kho</h2>
+<h1>🔎 Tra cứu vị trí thuốc / vật tư</h1>
+<input id="search" placeholder="Nhập tên thuốc, mã dược, nhóm…" />
 
-  <input 
-    type="text" 
-    id="searchInput" 
-    placeholder="Nhập STT, mã dược, tên, ĐVT, tủ hoặc tầng..." 
-    onkeyup="searchData()" 
-  />
+<table>
+  <thead>
+    <tr>
+      <th>Nhóm</th>
+      <th>Mã dược</th>
+      <th>Tên thuốc</th>
+      <th>Đơn vị</th>
+      <th>Đơn giá</th>
+      <th>Kho</th>
+      <th>Tủ</th>
+      <th>Tầng</th>
+    </tr>
+  </thead>
+  <tbody id="result"></tbody>
+</table>
 
-  <table id="dataTable">
-    <thead>
-      <tr>
-        <th>STT</th>
-        <th>Mã dược</th>
-        <th>Tên</th>
-        <th>ĐVT</th>
-        <th>Tủ</th>
-        <th>Tầng</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+<p class="note">Dữ liệu lấy trực tiếp từ file <b>data.js</b>.</p>
 
-  <!-- 👉 FILE DỮ LIỆU ĐÃ CÓ -->
-  <script src="data.js"></script>
+<script src="data.js"></script>
+<script>
+  const resultEl = document.getElementById('result');
+  const searchEl = document.getElementById('search');
 
-  <script>
-    const tableBody = document.querySelector("#dataTable tbody");
+  function render(list) {
+    resultEl.innerHTML = '';
+    list.forEach(item => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${item['Nhóm'] || ''}</td>
+        <td>${item['Mã dược'] || ''}</td>
+        <td>${item['Tên thuốc, nồng độ, hàm lượng'] || ''}</td>
+        <td>${item['Đơn vị tính'] || ''}</td>
+        <td>${item['Đơn giá (có VAT)'] || ''}</td>
+        <td>${item['KHO'] || ''}</td>
+        <td>${item['Tủ'] || ''}</td>
+        <td>${item['Tầng'] ?? ''}</td>
+      `;
+      resultEl.appendChild(tr);
+    });
+  }
 
-    function renderTable(items) {
-  tableBody.innerHTML = "";
-  items.forEach(item => {
-    const row = `<tr>
-      <td>${item["STT"]}</td>
-      <td>${item["Mã dược"]}</td>
-      <td>${item["Tên thuốc, nồng độ, hàm lượng"]}</td>
-      <td>${item["Đơn vị tính"]}</td>
-      <td>${item["tủ"]}</td>
-      <td>${item["tầng (từ dưới lên)"]}</td>
-    </tr>`;
-    tableBody.innerHTML += row;
+  // Hiển thị ban đầu
+  render(data);
+
+  // Tìm kiếm theo mọi cột
+  searchEl.addEventListener('input', () => {
+    const key = searchEl.value.toLowerCase();
+    const filtered = data.filter(item =>
+      Object.values(item).join(' ').toLowerCase().includes(key)
+    );
+    render(filtered);
   });
-}
-
-    function searchData() {
-  const keyword = document
-    .getElementById("searchInput")
-    .value
-    .toLowerCase();
-
-  const filtered = data.filter(item =>
-    String(item["STT"]).toLowerCase().includes(keyword) ||
-    String(item["Mã dược"]).toLowerCase().includes(keyword) ||
-    String(item["Tên thuốc, nồng độ, hàm lượng"]).toLowerCase().includes(keyword) ||
-    String(item["Đơn vị tính"]).toLowerCase().includes(keyword) ||
-    String(item["tủ"]).toLowerCase().includes(keyword) ||
-    String(item["tầng (từ dưới lên)"]).toLowerCase().includes(keyword)
-  );
-
-  renderTable(filtered);
-}
-
-    // Hiển thị toàn bộ dữ liệu khi mở trang
-    renderTable(data);
-  </script>
+</script>
 
 </body>
 </html>
